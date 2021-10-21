@@ -11,6 +11,7 @@ export async function handler(event: ServerlessHttpEvent) {
   switch (query.action) {
     case 'env': return dumpEnv();
     case 'metadata': return dumpMetadata();
+    case 'internalUrl': return dumpInternalUrl();
     default: return dumpCode();
   }
 }
@@ -36,11 +37,22 @@ function dumpEnv() {
 async function dumpMetadata() {
   // see: https://cloud.yandex.ru/docs/serverless-containers/operations/sa
   const url = 'http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token';
-  const headers = { 'Metadata-Flavor': 'Google' };
-  const res = await fetch(url, { headers });
+  const reqHeaders = { 'Metadata-Flavor': 'Google' };
+  const res = await fetch(url, { headers: reqHeaders });
   if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
-  const json = await res.json();
-  return sendJson(json);
+  const headers = Array.from(res.headers.entries());
+  const body = await res.json();
+  return sendJson({ headers, body });
+}
+
+async function dumpInternalUrl() {
+  // const [ method, url ] = [ 'post', 'http://169.254.169.254/2018-06-01/runtime/init/ready' ];
+  const [ method, url ] = [ 'get', 'http://169.254.169.254/2018-06-01/runtime/init/await' ];
+  const res = await fetch(url, { method });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  const headers = Array.from(res.headers.entries());
+  const body = await res.json();
+  return sendJson({ headers, body });
 }
 
 function sendJson(json: unknown) {

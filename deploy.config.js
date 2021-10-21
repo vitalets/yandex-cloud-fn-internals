@@ -7,6 +7,7 @@ module.exports = {
     runtime: 'nodejs16-preview',
     timeout: 5,
     memory: 128,
+    account: 'tools-testing',
     environment: {
       NODE_ENV: 'production',
     },
