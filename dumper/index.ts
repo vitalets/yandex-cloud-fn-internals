@@ -5,7 +5,14 @@ import fg from 'fast-glob';
 import AdmZip from 'adm-zip';
 import contentDisposition from 'content-disposition';
 
-export async function handler() {
+export async function handler(event: ServerlessHttpEvent) {
+  const query = event.queryStringParameters || {};
+  return query.action === 'env'
+    ? dumpEnv()
+    : await dumpCode();
+}
+
+async function dumpCode() {
   const zip = new AdmZip();
   const files = await fg([
     '/function/**',
@@ -15,21 +22,22 @@ export async function handler() {
     '!/function/runtime/bin/**',
     '!/function/code/**',
   ], { dot: true });
-  // console.log(files.length);
-  // console.log(files);
   files.forEach(file => zip.addLocalFile(file, path.dirname(file)));
   return sendFile('function.zip', zip.toBuffer());
-  // return sendJson({ files });
 }
 
-// function sendJson(json: unknown) {
-//   return {
-//     statusCode: 200,
-//     headers: { 'Content-Type': 'application/json' },
-//     isBase64Encoded: false,
-//     body: JSON.stringify(json),
-//   };
-// }
+function dumpEnv() {
+  return sendJson(process.env);
+}
+
+function sendJson(json: unknown) {
+  return {
+    statusCode: 200,
+    headers: { 'Content-Type': 'application/json' },
+    isBase64Encoded: false,
+    body: JSON.stringify(json),
+  };
+}
 
 function sendFile(fileName: string, buffer: Buffer) {
   return {
@@ -41,4 +49,11 @@ function sendFile(fileName: string, buffer: Buffer) {
     isBase64Encoded: true,
     body: buffer.toString('base64'),
   };
+}
+
+export interface ServerlessHttpEvent {
+  httpMethod: string;
+  queryStringParameters: Record<string, string>;
+  isBase64Encoded: boolean;
+  body?: string;
 }
