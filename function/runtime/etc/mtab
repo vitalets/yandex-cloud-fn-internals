@@ -1,0 +1,11 @@
+/dev/root / squashfs ro,relatime 0 0
+devtmpfs /dev devtmpfs rw,relatime,size=13880k,nr_inodes=3470,mode=755 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+/var/run /run tmpfs rw,relatime,size=15892k,nr_inodes=3973 0 0
+/dev/vdb /function/scratch ext4 rw,nosuid,nodev,noatime,nodiratime,nobarrier,errors=panic 0 0
+/dev/vdb /tmp ext4 rw,nosuid,nodev,noatime,nodiratime,nobarrier,errors=panic 0 0
+cgroup-sysfs /sys/fs/cgroup tmpfs rw,nosuid,nodev,noatime,nodiratime,size=15892k,nr_inodes=3973 0 0
+cgroup-memory /sys/fs/cgroup/memory cgroup rw,nosuid,nodev,noatime,nodiratime,memory 0 0
+/dev/vdc /function/runtime squashfs ro,noatime,nodiratime 0 0
+/dev/vdd /function/code squashfs ro,nosuid,nodev,noatime,nodiratime 0 0

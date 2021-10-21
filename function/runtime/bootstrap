@@ -1,0 +1,29 @@
+#!/function/runtime/bin/node
+
+const ycfr = require("/function/runtime/runtime");
+ycfr.setupErrorHandling();
+
+// this code will (pre)load handler (and start user code)
+ycfr.preloadRuntime(
+    process.env['AWS_LAMBDA_RUNTIME_API'],
+    () => {
+        return new ycfr.HandlerLoader(
+            process.env['LAMBDA_RUNTIME_DIR'],
+            process.env['LAMBDA_TASK_ROOT']
+        ).load(process.env['_HANDLER']);
+    },
+    () => {
+        process.exit(1);
+    },
+    false
+).then((rt) => {
+    // start processing
+    const loop = rt.loop.bind(rt);
+    const concurrency = Math.max(1, parseInt(process.env['X_YCF_CONCURRENCY'], 10));
+    for (let i = 0; i < concurrency; i++) {
+        setTimeout(loop, 0);
+    }
+}).catch((e) => {
+    ycfr.Errors.logError(e);
+    process.exit(1);
+});
