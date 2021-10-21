@@ -16,12 +16,14 @@
   "dependencies": {
     "adm-zip": "^0.5.9",
     "content-disposition": "^0.5.3",
-    "fast-glob": "^3.2.7"
+    "fast-glob": "^3.2.7",
+    "node-fetch": "^2.6.5"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.4.34",
     "@types/content-disposition": "^0.5.4",
     "@types/node": "^16.11.1",
+    "@types/node-fetch": "^2.5.12",
     "@typescript-eslint/eslint-plugin": "^5.1.0",
     "@typescript-eslint/parser": "^5.1.0",
     "eslint": "^8.0.1",

@@ -4,12 +4,15 @@ import path from 'path';
 import fg from 'fast-glob';
 import AdmZip from 'adm-zip';
 import contentDisposition from 'content-disposition';
+import fetch from 'node-fetch';
 
 export async function handler(event: ServerlessHttpEvent) {
   const query = event.queryStringParameters || {};
-  return query.action === 'env'
-    ? dumpEnv()
-    : await dumpCode();
+  switch (query.action) {
+    case 'env': return dumpEnv();
+    case 'metadata': return dumpMetadata();
+    default: return dumpCode();
+  }
 }
 
 async function dumpCode() {
@@ -28,6 +31,16 @@ async function dumpCode() {
 
 function dumpEnv() {
   return sendJson(process.env);
+}
+
+async function dumpMetadata() {
+  // see: https://cloud.yandex.ru/docs/serverless-containers/operations/sa
+  const url = 'http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token';
+  const headers = { 'Metadata-Flavor': 'Google' };
+  const res = await fetch(url, { headers });
+  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  const json = await res.json();
+  return sendJson(json);
 }
 
 function sendJson(json: unknown) {
