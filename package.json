@@ -32,5 +32,9 @@
     "typescript": "^4.4.4",
     "yandex-cloud-deploy-fn": "^1.1.2"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vitalets/yandex-cloud-fn-internals.git"
+  },
   "license": "MIT"
 }
