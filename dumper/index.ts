@@ -35,7 +35,7 @@ function sendJson(json: unknown) {
     statusCode: 200,
     headers: { 'Content-Type': 'application/json' },
     isBase64Encoded: false,
-    body: JSON.stringify(json),
+    body: JSON.stringify(json, null, 2),
   };
 }
 
