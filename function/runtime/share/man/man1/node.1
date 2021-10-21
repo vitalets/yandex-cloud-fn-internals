@@ -78,7 +78,7 @@ Aborting instead of exiting causes a core file to be generated for analysis.
 .It Fl -completion-bash
 Print source-able bash completion script for Node.js.
 .
-.It Fl -conditions Ar string
+.It Fl C , Fl -conditions Ar string
 Use custom conditional exports conditions.
 .Ar string
 .
@@ -136,11 +136,8 @@ Enable FIPS-compliant crypto at startup.
 Requires Node.js to be built with
 .Sy ./configure --openssl-fips .
 .
-.It Fl -experimental-abortcontroller
-Enable experimental AbortController and AbortSignal support.
-.
 .It Fl -enable-source-maps
-Enable experimental Source Map V3 support for stack traces.
+Enable Source Map V3 support for stack traces.
 .
 .It Fl -experimental-import-meta-resolve
 Enable experimental ES modules support for import.meta.resolve().
@@ -156,10 +153,8 @@ to use as a custom module loader.
 .It Fl -experimental-policy
 Use the specified file as a security policy.
 .
-.It Fl -experimental-repl-await
-Enable experimental top-level
-.Sy await
-keyword support in REPL.
+.It Fl -no-experimental-repl-await
+Disable top-level await keyword support in REPL.
 .
 .It Fl -experimental-specifier-resolution
 Select extension resolution algorithm for ES Modules; either 'explicit' (default) or 'node'.
@@ -184,6 +179,10 @@ Same requirements as
 .
 .It Fl -frozen-intrinsics
 Enable experimental frozen intrinsics support.
+.
+.It Fl -heapsnapshot-near-heap-limit Ns = Ns Ar max_count
+Generate heap snapshot when the V8 heap usage is approaching the heap limit.
+No more than the specified number of snapshots will be generated.
 .
 .It Fl -heapsnapshot-signal Ns = Ns Ar signal
 Generate heap snapshot on specified signal.
@@ -265,7 +264,7 @@ This flag is inherited from V8 and is subject to change upstream. It may
 disappear in a non-semver-major release.
 .
 .It Fl -max-http-header-size Ns = Ns Ar size
-Specify the maximum size of HTTP headers in bytes. Defaults to 16KB.
+Specify the maximum size of HTTP headers in bytes. Defaults to 16 KB.
 .
 .It Fl -napi-modules
 This option is a no-op.
@@ -280,6 +279,10 @@ These will still be enabled dynamically when `async_hooks` is enabled.
 .
 .It Fl -no-warnings
 Silence all process warnings (including deprecations).
+.
+.It Fl -node-memory-debug
+Enable extra debug checks for memory leaks in Node.js internals. This is
+usually only useful for developers debugging Node.js itself.
 .
 .It Fl -openssl-config Ns = Ns Ar file
 Load an OpenSSL configuration file on startup.
@@ -353,6 +356,13 @@ Enables
 .Sy diagnostic report
 to be generated on un-caught exceptions. Useful when inspecting JavaScript
 stack in conjunction with native stack and other runtime environment data.
+.
+.It Fl -secure-heap Ns = Ns Ar n
+Specify the size of the OpenSSL secure heap. Any value less than 2 disables
+the secure heap. The default is 0. The value must be a power of two.
+.
+.It Fl -secure-heap-min Ns = Ns Ar n
+Specify the minimum allocation from the OpenSSL secure heap. The default is 2. The value must be a power of two.
 .
 .It Fl -throw-deprecation
 Throw errors for deprecations.
@@ -686,7 +696,7 @@ Documentation:
 .Sy https://nodejs.org/api/
 .
 .Pp
-GitHub repository & Issue Tracker:
+GitHub repository and issue tracker:
 .Sy https://github.com/nodejs/node
 .
 .Pp

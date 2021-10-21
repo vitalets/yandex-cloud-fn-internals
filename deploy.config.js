@@ -4,7 +4,7 @@ module.exports = {
   deploy: {
     files: [ 'package*.json', 'dist/**/*.{js,json}' ],
     handler: 'dist/index.handler',
-    runtime: 'nodejs14',
+    runtime: 'nodejs16-preview',
     timeout: 5,
     memory: 128,
     environment: {
