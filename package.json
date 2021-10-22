@@ -6,8 +6,8 @@
     "lint": "eslint dumper --ext .ts",
     "tsc": "tsc --noEmit",
     "build": "rm -rf dist && tsc",
-    "dump:code": "./dumper/dump.sh",
-    "dump:env": "ACTION=env ./dumper/dump.sh",
+    "dump": "./dumper/dump.sh",
+    "eval": "ACTION=eval ./dumper/dump.sh",
     "deploy": "npm run lint && npm run build && deploy-fn"
   },
   "lint-staged": {

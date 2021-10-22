@@ -12,3 +12,4 @@ npm-debug.log
 /dist
 /todo.txt
 /dumper/dump.sh
+/dumper/eval.js

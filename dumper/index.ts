@@ -4,19 +4,16 @@ import path from 'path';
 import fg from 'fast-glob';
 import AdmZip from 'adm-zip';
 import contentDisposition from 'content-disposition';
-import fetch from 'node-fetch';
 
 export async function handler(event: ServerlessHttpEvent) {
   const query = event.queryStringParameters || {};
   switch (query.action) {
-    case 'env': return dumpEnv();
-    case 'metadata': return dumpMetadata();
-    case 'internalUrl': return dumpInternalUrl();
-    default: return dumpCode();
+    case 'eval': return evaluate(getRequestBody(event) || '');
+    default: return dump();
   }
 }
 
-async function dumpCode() {
+async function dump() {
   const zip = new AdmZip();
   const files = await fg([
     '/function/**',
@@ -30,29 +27,15 @@ async function dumpCode() {
   return sendFile('function.zip', zip.toBuffer());
 }
 
-function dumpEnv() {
-  return sendJson(process.env);
-}
-
-async function dumpMetadata() {
-  // see: https://cloud.yandex.ru/docs/serverless-containers/operations/sa
-  const url = 'http://169.254.169.254/computeMetadata/v1/instance/service-accounts/default/token';
-  const reqHeaders = { 'Metadata-Flavor': 'Google' };
-  const res = await fetch(url, { headers: reqHeaders });
-  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
-  const headers = Array.from(res.headers.entries());
-  const body = await res.json();
-  return sendJson({ headers, body });
-}
-
-async function dumpInternalUrl() {
-  // const [ method, url ] = [ 'post', 'http://169.254.169.254/2018-06-01/runtime/init/ready' ];
-  const [ method, url ] = [ 'get', 'http://169.254.169.254/2018-06-01/runtime/init/await' ];
-  const res = await fetch(url, { method });
-  if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
-  const headers = Array.from(res.headers.entries());
-  const body = await res.json();
-  return sendJson({ headers, body });
+async function evaluate(code: string) {
+  let result;
+  try {
+    const fn = eval(code);
+    result = await fn();
+  } catch (e) {
+    result = e.message;
+  }
+  return sendJson({ result });
 }
 
 function sendJson(json: unknown) {
@@ -74,6 +57,13 @@ function sendFile(fileName: string, buffer: Buffer) {
     isBase64Encoded: true,
     body: buffer.toString('base64'),
   };
+}
+
+function getRequestBody(event: ServerlessHttpEvent) {
+  const { body, isBase64Encoded } = event;
+  return body && isBase64Encoded
+    ? Buffer.from(body, 'base64').toString()
+    : body;
 }
 
 export interface ServerlessHttpEvent {
